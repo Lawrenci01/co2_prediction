@@ -1,9 +1,0 @@
-flask
-flask-cors
-sqlalchemy
-mysql-connector-python
-gunicorn
-python-dotenv
-pandas
-numpy
-pymysql
