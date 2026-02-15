@@ -1,0 +1,50 @@
+name: Weekly CO2 Prediction Pipeline
+
+# Run every Sunday at midnight UTC
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Every Sunday at 00:00 UTC
+  
+  # Allow manual trigger from GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  run-prediction:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run ML Pipeline
+        env:
+          # GitHub Secrets - set these in repo Settings > Secrets
+          MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
+          MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_DB: ${{ secrets.MYSQL_DB }}
+          MYSQL_SSL_CA: ${{ secrets.MYSQL_SSL_CA }}
+        run: |
+          echo "Starting weekly CO2 prediction pipeline..."
+          python run_weekly_pipeline.py
+      
+      - name: Pipeline Status
+        if: success()
+        run: echo "✅ Pipeline completed successfully!"
+      
+      - name: Pipeline Failed
+        if: failure()
+        run: |
+          echo "❌ Pipeline failed!"
+          exit 1
