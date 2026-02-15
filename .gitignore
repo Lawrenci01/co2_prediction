@@ -1,6 +1,5 @@
 @"
 .env
-aiven-ca.pem
 models/
 __pycache__/
 data/
