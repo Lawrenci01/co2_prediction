@@ -3,33 +3,25 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def get_env(key, default=None, required=False):
-    """Get environment variable with better error messages"""
-    value = os.environ.get(key, default)
-    if required and value is None:
-        raise ValueError(
-            f" Missing required environment variable: {key}\n"
-            f"   Please set it in Render Dashboard > Environment"
-        )
-    return value
-
+# ----------------------------
 # MySQL configuration
-MYSQL_HOST     = get_env('MYSQL_HOST', required=True)
-MYSQL_PORT     = int(get_env('MYSQL_PORT', '3306'))
-MYSQL_USER     = get_env('MYSQL_USER', required=True)
-MYSQL_PASSWORD = get_env('MYSQL_PASSWORD', required=True)
-MYSQL_DB       = get_env('MYSQL_DB', required=True)
-MYSQL_SSL_CA   = get_env('MYSQL_SSL_CA', '')  # Empty string if no SSL
+# ----------------------------
+MYSQL_HOST     = os.environ.get('MYSQL_HOST')
+MYSQL_PORT     = int(os.environ.get('MYSQL_PORT', 27069))
+MYSQL_USER     = os.environ.get('MYSQL_USER')
+MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD')
+MYSQL_DB       = os.environ.get('MYSQL_DB')
+MYSQL_SSL_CA   = os.environ.get('MYSQL_SSL_CA')
 
 # ----------------------------
-# LSTM configuration (PRODUCTION)
+# OPTIMIZED LSTM configuration
 #
-# SEQ_LENGTH = 4320  → 3 days of per-minute data as input window
-# PREDICT_LENGTH = 10080 → predict next 7 days (minute by minute)
-# FETCH_DAYS = 14    → fetch last 14 days of sensor data for training
+# CHANGED: From minutely to hourly (60× FASTER!)
+# OLD: SEQ_LENGTH = 4320, PREDICT_LENGTH = 10080 (8-10 minutes)
+# NEW: SEQ_LENGTH = 72, PREDICT_LENGTH = 168 (10-20 seconds)
 # ----------------------------
-SEQ_LENGTH     = 4320    # 3 days look-back window
-PREDICT_LENGTH = 10080   # 7 days prediction (60 min x 24 hr x 7)
+SEQ_LENGTH     = 72      # 3 days of hourly data (was 4320 minutes)
+PREDICT_LENGTH = 168     # 7 days hourly (was 10080 minutes)
 FETCH_DAYS     = 14
 
 # ----------------------------
