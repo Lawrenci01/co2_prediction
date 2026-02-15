@@ -1,0 +1,10 @@
+flask
+flask-cors
+sqlalchemy
+mysql-connector-python
+pandas
+numpy
+scikit-learn
+tensorflow
+joblib
+schedule
