@@ -1,0 +1,15 @@
+@"
+.env
+aiven-ca.pem
+models/
+__pycache__/
+data/
+backend/
+static/
+templates/
+*.keras
+*.pkl
+scaler.pkl
+test_mysql_ssl.py
+app.py
+"@ | Out-File -FilePath .gitignore -Encoding utf8
