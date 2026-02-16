@@ -104,3 +104,27 @@ sqlalchemy.exc.ProgrammingError: (mysql.connector.errors.ProgrammingError) 1054 
 2026-02-15 23:31:16,628 - INFO - ============================================================
 2026-02-15 23:31:16,628 - INFO - WEEKLY PIPELINE COMPLETED SUCCESSFULLY
 2026-02-15 23:31:16,629 - INFO - ============================================================
+2026-02-16 15:47:35,572 - INFO - Database engine initialized successfully
+2026-02-16 15:47:35,576 - INFO - Starting Flask app on port 5000
+2026-02-16 15:47:35,599 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.100.42:5000
+2026-02-16 15:47:35,601 - INFO - [33mPress CTRL+C to quit[0m
+2026-02-16 15:47:43,881 - INFO - 192.168.100.42 - - [16/Feb/2026 15:47:43] "GET / HTTP/1.1" 200 -
+2026-02-16 15:47:44,190 - INFO - 192.168.100.42 - - [16/Feb/2026 15:47:44] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-02-16 15:47:55,475 - ERROR - Error fetching latest prediction: (mysql.connector.errors.DatabaseError) 2005 (HY000): Unknown MySQL server host 'mysql-c8cdfc5-ariasampoy414-f96b.c.aivencloud.com' (11001)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2026-02-16 15:47:55,479 - INFO - 192.168.100.42 - - [16/Feb/2026 15:47:55] "[35m[1mGET /api/predictions/latest HTTP/1.1[0m" 500 -
+2026-02-16 15:49:44,053 - ERROR - Error fetching latest prediction: (mysql.connector.errors.DatabaseError) 2005 (HY000): Unknown MySQL server host 'mysql-c8cdfc5-ariasampoy414-f96b.c.aivencloud.com' (11001)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2026-02-16 15:49:44,054 - INFO - 192.168.100.42 - - [16/Feb/2026 15:49:44] "[35m[1mGET /api/predictions/latest HTTP/1.1[0m" 500 -
+2026-02-16 15:50:28,240 - INFO - Database engine initialized successfully
+2026-02-16 15:50:28,242 - INFO - Starting Flask app on port 5000
+2026-02-16 15:50:28,267 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.60.29:5000
+2026-02-16 15:50:28,268 - INFO - [33mPress CTRL+C to quit[0m
+2026-02-16 15:51:08,829 - INFO - 192.168.60.29 - - [16/Feb/2026 15:51:08] "GET / HTTP/1.1" 200 -
+2026-02-16 15:51:08,938 - INFO - 192.168.60.29 - - [16/Feb/2026 15:51:08] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -

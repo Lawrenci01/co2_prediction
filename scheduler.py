@@ -10,11 +10,11 @@ from train_and_predict import run_pipeline
 # ----------------------------
 
 def job():
-    print(f"\n⏰ Scheduler triggered at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"\n Scheduler triggered at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     try:
         run_pipeline()
     except Exception as e:
-        print(f"❌ Pipeline failed: {e}")
+        print(f" Pipeline failed: {e}")
 
 # --- Schedule options (uncomment the one you want) ---
 
@@ -32,12 +32,12 @@ schedule.every().sunday.at("00:00").do(job)
 
 # ----------------------------
 if __name__ == "__main__":
-    print("🚀 Scheduler started.")
+    print(" Scheduler started.")
     print(f"   Next run: {schedule.next_run()}")
     print("   Press Ctrl+C to stop.\n")
 
     # Run once immediately on startup so you don't wait a full week
-    print("▶️  Running pipeline immediately on startup...")
+    print("  Running pipeline immediately on startup...")
     job()
 
     # Then keep running on schedule

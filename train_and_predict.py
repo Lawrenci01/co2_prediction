@@ -75,7 +75,7 @@ def fetch_sensor_data(days_back=FETCH_DAYS):
             total = conn.execute(text(f"SELECT COUNT(*) FROM {SENSOR_TABLE}")).scalar()
             latest = conn.execute(text(f"SELECT MAX(recorded_at) FROM {SENSOR_TABLE}")).scalar()
         
-        logger.info(f"ℹ️  Total rows in sensor_data: {total}, latest recorded_at: {latest}")
+        logger.info(f"ℹ  Total rows in sensor_data: {total}, latest recorded_at: {latest}")
 
         # Try recent data first
         query = f"""
@@ -95,7 +95,7 @@ def fetch_sensor_data(days_back=FETCH_DAYS):
 
         # Fall back to all available data if not enough recent rows
         if len(df) <= SEQ_LENGTH:
-            logger.warning(f"⚠️  Only {len(df)} recent rows (need >{SEQ_LENGTH}). Fetching all available data...")
+            logger.warning(f"  Only {len(df)} recent rows (need >{SEQ_LENGTH}). Fetching all available data...")
             query_all = f"""
             SELECT
                 recorded_at   AS timestamp,
@@ -111,7 +111,7 @@ def fetch_sensor_data(days_back=FETCH_DAYS):
             df = pd.read_sql_query(query_all, engine)
 
         if df.empty:
-            logger.error("❌ No IoT data found in database.")
+            logger.error(" No IoT data found in database.")
             return None
 
         df.set_index('timestamp', inplace=True)
@@ -122,12 +122,12 @@ def fetch_sensor_data(days_back=FETCH_DAYS):
         # Handle missing values
         df = df.interpolate(method='linear').ffill().bfill()
 
-        logger.info(f"✅ Fetched {len(df)} rows from sensor_data (resampled to hourly)")
+        logger.info(f" Fetched {len(df)} rows from sensor_data (resampled to hourly)")
         logger.info(f"   Date range: {df.index.min()} → {df.index.max()}")
         return df
 
     except Exception as e:
-        logger.error(f"❌ Error fetching IoT data: {e}", exc_info=True)
+        logger.error(f" Error fetching IoT data: {e}", exc_info=True)
         return None
 
 
@@ -137,15 +137,16 @@ def fetch_sensor_data(days_back=FETCH_DAYS):
 def load_fallback_csv():
     csv_path = "data/hourly_data.csv"
     if not os.path.exists(csv_path):
-        logger.error(f"❌ Fallback CSV not found at {csv_path}")
+        logger.error(f" Fallback CSV not found at {csv_path}")
         return None
+
     
-    logger.info(f"📂 No DB data yet — loading fallback CSV: {csv_path}")
+    logger.info(f" No DB data yet — loading fallback CSV: {csv_path}")
     df = pd.read_csv(csv_path, parse_dates=['timestamp'])
     df.set_index('timestamp', inplace=True)
     df.columns = FEATURES
     
-    logger.info(f"✅ Loaded {len(df)} rows from CSV.")
+    logger.info(f" Loaded {len(df)} rows from CSV.")
     logger.info(f"   Date range: {df.index.min()} → {df.index.max()}")
     return df
 
@@ -245,9 +246,9 @@ def store_prediction(co2, temperature, humidity):
                 {"ts": datetime.now(), "co2": co2, "temp": temperature, "hum": humidity}
             )
             conn.commit()
-        logger.info(f"✅ Stored prediction: CO2={co2:.2f} ppm, Temp={temperature:.2f}°C, Humidity={humidity:.2f}%")
+        logger.info(f" Stored prediction: CO2={co2:.2f} ppm, Temp={temperature:.2f}°C, Humidity={humidity:.2f}%")
     except Exception as e:
-        logger.error(f"❌ Error storing prediction: {e}")
+        logger.error(f" Error storing prediction: {e}")
 
 
 # ----------------------------
@@ -263,12 +264,12 @@ def run_pipeline():
     if df is None:
         df = load_fallback_csv()
     if df is None:
-        logger.error("❌ No data available. Exiting.")
+        logger.error(" No data available. Exiting.")
         return
 
     # 2. Validate enough rows for sequencing
     if len(df) <= SEQ_LENGTH:
-        logger.error(f"❌ Not enough data: need >{SEQ_LENGTH} rows, got {len(df)}.")
+        logger.error(f" Not enough data: need >{SEQ_LENGTH} rows, got {len(df)}.")
         logger.error(f"   Tip: Reduce SEQ_LENGTH in config.py or wait for more IoT data.")
         return
 
@@ -276,19 +277,19 @@ def run_pipeline():
     os.makedirs('models', exist_ok=True)
     if os.path.exists(SCALER_PATH):
         scaler = joblib.load(SCALER_PATH)
-        logger.info("✅ Loaded existing scaler.")
+        logger.info(" Loaded existing scaler.")
     else:
         scaler = MinMaxScaler()
         scaler.fit(df[FEATURES].values)
         joblib.dump(scaler, SCALER_PATH)
-        logger.info("✅ Fitted and saved new scaler.")
+        logger.info(" Fitted and saved new scaler.")
 
     # 4. Scale and create sequences WITH validation split
     data_scaled = scaler.transform(df[FEATURES].values)
     X_train, y_train, X_val, y_val = create_sequences(data_scaled, SEQ_LENGTH)
     
     if len(X_train) == 0:
-        logger.error("❌ Not enough data to create sequences.")
+        logger.error(" Not enough data to create sequences.")
         return
 
     # 5. Train or fine-tune model with early stopping
@@ -310,7 +311,7 @@ def run_pipeline():
     if os.path.exists(MODEL_PATH):
         model = load_model(MODEL_PATH, compile=False)
         model.compile(optimizer='adam', loss='mse', metrics=['mae'])
-        logger.info("✅ Loaded existing model — fine-tuning on latest data...")
+        logger.info(" Loaded existing model — fine-tuning on latest data...")
         
         history = model.fit(
             X_train, y_train,
@@ -320,9 +321,9 @@ def run_pipeline():
             callbacks=callbacks,
             verbose=1
         )
-        logger.info("✅ Model fine-tuned and saved.")
+        logger.info(" Model fine-tuned and saved.")
     else:
-        logger.info("🔄 Training new model from scratch...")
+        logger.info(" Training new model from scratch...")
         model = build_model(SEQ_LENGTH, len(FEATURES))
         
         history = model.fit(
@@ -333,7 +334,7 @@ def run_pipeline():
             callbacks=callbacks,
             verbose=1
         )
-        logger.info("✅ New model trained and saved.")
+        logger.info(" New model trained and saved.")
     
     # Log training quality
     final_train_loss = history.history['loss'][-1]
@@ -342,13 +343,13 @@ def run_pipeline():
     logger.info(f"   Validation loss: {final_val_loss:.4f}")
     
     if final_val_loss > final_train_loss * 1.5:
-        logger.warning("⚠️  Model may be overfitting (validation loss much higher than training)")
+        logger.warning("  Model may be overfitting (validation loss much higher than training)")
 
     # 6. Predict and store
     co2_avg, temp_avg, hum_avg = predict_next_week_avg(model, scaler, df)
     store_prediction(co2_avg, temp_avg, hum_avg)
     
-    logger.info("\n🎉 Pipeline complete!")
+    logger.info("\n Pipeline complete!")
 
 
 if __name__ == "__main__":

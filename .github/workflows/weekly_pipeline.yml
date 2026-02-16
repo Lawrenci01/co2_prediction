@@ -41,10 +41,10 @@ jobs:
       
       - name: Pipeline Status
         if: success()
-        run: echo "✅ Pipeline completed successfully!"
+        run: echo " Pipeline completed successfully!"
       
       - name: Pipeline Failed
         if: failure()
         run: |
-          echo "❌ Pipeline failed!"
+          echo " Pipeline failed!"
           exit 1
